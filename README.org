@@ -1,0 +1,66 @@
+
+* Table of contents                               :toc_2:noexport:
+- [[#introduction][Introduction]]
+- [[#geospatial-raster][Geospatial Raster]]
+  - [[#geotiff][GeoTIFF]]
+  - [[#netcdf][NetCDF]]
+- [[#geospatial-vector][Geospatial Vector]]
+- [[#timeseries][Timeseries]]
+  - [[#csv][CSV]]
+  - [[#netcdf-1][NetCDF]]
+- [[#other--misc][Other / Misc]]
+
+* Introduction
+
+The purpose of this document is to provide guidance for data best-practices. The target audience is authors contributing data to [[https://www.earth-system-science-data.net/][Earth System Science Data]], and therefore the expected data types are Earth system data.
+
+* Geospatial Raster
+
+We suggest NetCDF as the best format for geospatial raster data. NetCDF takes more time to produce than GeoTIFF, but is then often easier to use, and can easily be converted to GeoTIFF by users or producers if you want to provide data in both formats. 
+
+** GeoTIFF
+
+To produce GeoTIFFs from NetCDF files, use the following command:
+
+#+BEGIN_SRC bash :results verbatim :exports both
+gdal_translate...
+#+END_SRC
+
+GeoTIFFs files should:
++ Use the smallest data type needed to contain the data to its true resolution
++ scale and offset
++ compression
++ multi-band
++ embed color info
+
+** NetCDF
+
++ Per-variable compression
++ Open in QGIS
++ embed styling
++ CF compliant
++ ACDD compliant
+
+* Geospatial Vector
+
++ QGIS
++ Styling
+
+* Timeseries
+
+** CSV
+
++ Time in first column
++ ISO 8601 (see below)
+
+** NetCDF
+
++ See above
+
+* Other / Misc
+
++ Dates should be [[https://en.wikipedia.org/wiki/ISO_8601][ISO 8601 standard]].: 
+
++ Times should be in UTC. If desired, UTC times can be followed by local times.
+  + Justification: Both time zones and the definition of local time may changes if a location chooses to implement (or not) a "summer" or "winter" clock change. Therefore, noon today may be a different solar hour than noon tomorrow because of clock changes. Or noon today may be an hour different from noon on the same date 10 years from now, if a location stops or starts implementing a clock change.
+

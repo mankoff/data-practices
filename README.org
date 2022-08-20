@@ -1,66 +1,114 @@
 
 * Table of contents                               :toc_2:noexport:
 - [[#introduction][Introduction]]
-- [[#geospatial-raster][Geospatial Raster]]
-  - [[#geotiff][GeoTIFF]]
-  - [[#netcdf][NetCDF]]
-- [[#geospatial-vector][Geospatial Vector]]
-- [[#timeseries][Timeseries]]
-  - [[#csv][CSV]]
-  - [[#netcdf-1][NetCDF]]
+- [[#products][Products]]
+  - [[#geospatial-raster][Geospatial Raster]]
+  - [[#geospatial-vector][Geospatial Vector]]
+  - [[#timeseries][Timeseries]]
 - [[#other--misc][Other / Misc]]
+  - [[#dates][Dates]]
+  - [[#times][Times]]
+  - [[#tables][Tables]]
 
 * Introduction
 
-The purpose of this document is to provide guidance for data best-practices. The target audience is authors contributing data to [[https://www.earth-system-science-data.net/][Earth System Science Data]], and therefore the expected data types are Earth system data.
+The purpose of this document is to provide guidance for data best-practices. The target audience is authors contributing data to [[https://www.earth-system-science-data.net/][Earth System Science Data]], and therefore the expected data cover the Earth science domain.
 
-* Geospatial Raster
+This document is organized by data product type, and then expected file formats for each product. Example code is written in the Python language.
 
-We suggest NetCDF as the best format for geospatial raster data. NetCDF takes more time to produce than GeoTIFF, but is then often easier to use, and can easily be converted to GeoTIFF by users or producers if you want to provide data in both formats. 
+* Products
+** Geospatial Raster
 
-** GeoTIFF
+We suggest NetCDF as the best format for geospatial raster data, due to metadata support. NetCDF may take more time to produce than the traditional format, GeoTIFF, but is then often easier to use, and can easily be converted to GeoTIFF by users or producers if you want to provide data in both formats. 
 
+*** NetCDF
+
+A well-produced NetCDF file should be able to be drag-and-dropped into [[https://qgis.org][QGIS]], and be properly projected into whatever projection is used by the open project, and correctly reproject on the fly by QGIS. In addition, if appropriate, the file should be compliant with [[http://cfconventions.org/][CF]] and [[https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3][ACDD]] metadata standards.
+
+**** GIS projection
+
++ crs
++ grid_mapping
+
+**** Metadata standards
+
++ CF
++ ACDD
+
+  
+Some helpful NetCDF sites: http://cfconventions.org/ and instructions how to make up new variable names at http://cfconventions.org/Data/cf-standard-names/docs/guidelines.html
+
+Guidance: https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/
+
+Compliance checker https://github.com/ioos/compliance-checker
+
+#+BEGIN_SRC bash
+pip install compliance-checker
+cchecker.py -t acdd:1.3 -t cf:1.8 foo.nc
+#+END_SRC
+
+**** Data types
+
++ Consider precision
++ Packing
+
+**** Other
+
++ Compression (per-variable)
++ Embed styling
+
+*** GeoTIFF
+
+**** Generating from NetCDF
 To produce GeoTIFFs from NetCDF files, use the following command:
 
 #+BEGIN_SRC bash :results verbatim :exports both
 gdal_translate...
 #+END_SRC
 
+**** Compression
+
+**** Packing
+
 GeoTIFFs files should:
 + Use the smallest data type needed to contain the data to its true resolution
 + scale and offset
-+ compression
+
+**** Other
+
 + multi-band
 + embed color info
 
-** NetCDF
+** Geospatial Vector
 
-+ Per-variable compression
-+ Open in QGIS
-+ embed styling
-+ CF compliant
-+ ACDD compliant
-
-* Geospatial Vector
+GeoPackage or NetCDF, not Shapefile
 
 + QGIS
 + Styling
 
-* Timeseries
+** Timeseries
 
-** CSV
+*** CSV
 
 + Time in first column
 + ISO 8601 (see below)
 
-** NetCDF
+*** NetCDF
 
 + See above
 
 * Other / Misc
 
-+ Dates should be [[https://en.wikipedia.org/wiki/ISO_8601][ISO 8601 standard]].: 
+** Dates
 
-+ Times should be in UTC. If desired, UTC times can be followed by local times.
-  + Justification: Both time zones and the definition of local time may changes if a location chooses to implement (or not) a "summer" or "winter" clock change. Therefore, noon today may be a different solar hour than noon tomorrow because of clock changes. Or noon today may be an hour different from noon on the same date 10 years from now, if a location stops or starts implementing a clock change.
+Dates should be [[https://en.wikipedia.org/wiki/ISO_8601][ISO 8601 standard]].
 
+** Times
+
+Times should be in UTC. If desired, UTC times can be followed by local times.
+
+Justification: Both time zones and the definition of local time may changes if a location chooses to implement (or not) a "summer" or "winter" clock change. Therefore, noon today may be a different solar hour than noon tomorrow because of clock changes. Or noon today may be an hour different from noon on the same date 10 years from now, if a location stops or starts implementing a clock change.
+
+** Tables
+
+Any table in a paper that is more than a few cells in size should be included as a data product in a machine-readable format (e.g., CSV)

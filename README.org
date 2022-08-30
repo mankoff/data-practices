@@ -9,6 +9,7 @@
   - [[#shapefile][Shapefile]]
   - [[#zarr][ZARR]]
 - [[#data-types][Data Types]]
+  - [[#cloud-web-optimized][Cloud (web) optimized]]
   - [[#database][Database]]
   - [[#geospatial-raster][Geospatial raster]]
   - [[#geospatial-vector][Geospatial vector]]
@@ -141,6 +142,11 @@ Shapefiles should be replaced by GeoPackage files.
 + https://zarr.readthedocs.io/en/stable/
 
 * Data Types
+** Cloud (web) optimized
+
++ Cloud optimized GeoTIFF (=COG=)
++ =Zarr=
+
 ** Database
 
 sqlite, MySQL, or any other open source database. The advantage of sqlite, if appropriate for a project, is that a single file contains the database and can therefore easily be shared.

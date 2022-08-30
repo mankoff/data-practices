@@ -1,114 +1,170 @@
 
 * Table of contents                               :toc_2:noexport:
 - [[#introduction][Introduction]]
-- [[#products][Products]]
-  - [[#geospatial-raster][Geospatial Raster]]
-  - [[#geospatial-vector][Geospatial Vector]]
-  - [[#timeseries][Timeseries]]
-- [[#other--misc][Other / Misc]]
+- [[#file-format][File Format]]
+  - [[#commas-separated-values-csv][Commas separated values (CSV)]]
+  - [[#geopackage][GeoPackage]]
+  - [[#geotiff][GeoTIFF]]
+  - [[#netcdf][NetCDF]]
+  - [[#shapefile][Shapefile]]
+- [[#data-types][Data Types]]
+  - [[#database][Database]]
+  - [[#geospatial-raster][Geospatial raster]]
+  - [[#geospatial-vector][Geospatial vector]]
+  - [[#point-cloud][Point cloud]]
+  - [[#tables][Tables]]
+  - [[#time-series][Time series]]
+- [[#other][Other]]
   - [[#dates][Dates]]
   - [[#times][Times]]
-  - [[#tables][Tables]]
 
 * Introduction
 
-The purpose of this document is to provide guidance for data best-practices. The target audience is authors contributing data to [[https://www.earth-system-science-data.net/][Earth System Science Data]], and therefore the expected data cover the Earth science domain.
+The purpose of this document is to provide guidance and suggestions for data best-practices. The target audience is authors contributing data to [[https://www.earth-system-science-data.net/][Earth System Science Data]] (ESSD), and therefore the expected data cover the Earth science domain. However, we hope the information contained here is useful even for people with no association with ESSD. Formats and metadata suggested here are not a requirement for data published in ESSD, only a suggestion.
 
-This document is organized by data product type, and then expected file formats for each product. Example code is written in the Python language.
+This document is organized primarily by file format (e.g, CSV, NetCDF, XLS) in alphabetical order. Further sections address various data types (e.g. time series, point cloud, geospatial raster). Various other best practices are listed in section Other. Example code is written in the Python language.
 
-* Products
-** Geospatial Raster
+* File Format
+
+Not all possible file formats and data types are covered here, only a subset of the most common file formats. However, some of the general concepts here should give guidance on how to produce good data in formats not listed here.
+
+This document is also a living document, and will change as best-practices change. Open an ISSUE if you have questions, comments, corrections, or suggestions.
+
+** Commas separated values (CSV)
+
+If the data contains a lot of commas, then the data should be encoded in BSV (bar separated values) rather than CSV format. We find that the vertical bar or pipe symbol, "|", is one of the least common characters and is therefore less likely to occur in the data values than a comma.
+
+That is, instead of
+
+#+BEGIN_EXAMPLE csv
+header1,header2
+foo,bar
+#+END_EXAMPLE
+
+The data should be
+
+#+BEGIN_EXAMPLE bsv
+header1|header2
+foo|bar
+#+END_EXAMPLE
+
+** GeoPackage
+
++ Should open and display correctly in QGIS
++ It is possible to store styles into a GeoPackage so that you can control how it looks when opened.
+  + https://ecodiv.earth/post/save-project-to-geopackage-in-qgis/
+  + https://gis.stackexchange.com/questions/273750/
+
+** GeoTIFF
+*** Generating from NetCDF
+
+#+BEGIN_SRC bash :results verbatim :exports both
+gdal_translate NETCDF:"input.nc":variable_name output.tif
+#+END_SRC
+
+*** Compression
+
+#+BEGIN_SRC bash :exports both
+gdal_translate -co "COMPRESS=DEFLATE" uncompress.tif compressed.tif
+#+END_SRC
+
+** NetCDF
 
 We suggest NetCDF as the best format for geospatial raster data, due to metadata support. NetCDF may take more time to produce than the traditional format, GeoTIFF, but is then often easier to use, and can easily be converted to GeoTIFF by users or producers if you want to provide data in both formats. 
 
-*** NetCDF
-
 A well-produced NetCDF file should be able to be drag-and-dropped into [[https://qgis.org][QGIS]], and be properly projected into whatever projection is used by the open project, and correctly reproject on the fly by QGIS. In addition, if appropriate, the file should be compliant with [[http://cfconventions.org/][CF]] and [[https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3][ACDD]] metadata standards.
 
-**** GIS projection
+*** GIS projection
 
-+ crs
-+ grid_mapping
+I hope to provide a complete example of how to build a NetCDF file that opens and reprojects in QGIS here. Until then, please
++ NetCDF files here for an example file that meets this goal: https://doi.org/10.22008/FK2/PLNUEO
+  + Hint: Use =ncdump -h= to examine that file and your file and get them to match
++ https://gis.stackexchange.com/a/255801/609
++ https://gis.stackexchange.com/a/377498/609
 
-**** Metadata standards
+*** Metadata standards
 
-+ CF
-+ ACDD
+A well-produced NetCDF file should (if appropriate) include CF and ACDD metadata.
 
-  
-Some helpful NetCDF sites: http://cfconventions.org/ and instructions how to make up new variable names at http://cfconventions.org/Data/cf-standard-names/docs/guidelines.html
++ CF info
+  + http://cfconventions.org/
+  + Instructions how to make up new variable names: http://cfconventions.org/Data/cf-standard-names/docs/guidelines.html
+  + https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/
 
-Guidance: https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/
++ ACDD info
+  + https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/
 
 Compliance checker https://github.com/ioos/compliance-checker
 
-#+BEGIN_SRC bash
+#+BEGIN_SRC bash :exports both
 pip install compliance-checker
-cchecker.py -t acdd:1.3 -t cf:1.8 foo.nc
+cchecker.py -t acdd:1.3 -t cf:1.8 file.nc
 #+END_SRC
 
-**** Data types
+*** Data types
 
++ Packing: =scale_factor= and =add_offset=
+  + https://www.unidata.ucar.edu/software/netcdf/workshops/2010/bestpractices/Packing.html
 + Consider precision
-+ Packing
+  + If your data is 0 to 100 and resolution of 1, it can be stored in an 8-bit integer. No need for 64 bit floats.
 
-**** Other
+*** Other
 
-+ Compression (per-variable)
-+ Embed styling
+NetCDF supports per-variable compression. An example of compressing variables from an =xarray= data structure is:
 
-*** GeoTIFF
-
-**** Generating from NetCDF
-To produce GeoTIFFs from NetCDF files, use the following command:
-
-#+BEGIN_SRC bash :results verbatim :exports both
-gdal_translate...
+#+BEGIN_SRC python :exports both
+comp = dict(zlib=True, complevel=2, dtype='float32')
+encoding = {var: comp for var in ds.data_vars} # all variables
+ds.to_netcdf('file.nc', mode='w', encoding=encoding)
 #+END_SRC
 
-**** Compression
+You can examine if variables are compressed with:
 
-**** Packing
+#+BEGIN_SRC bash :exports both
+ncdump -chs file.nc
+#+END_SRC
 
-GeoTIFFs files should:
-+ Use the smallest data type needed to contain the data to its true resolution
-+ scale and offset
 
-**** Other
+** Shapefile
 
-+ multi-band
-+ embed color info
+Shapefiles should be replaced by GeoPackage files.
 
-** Geospatial Vector
+* Data Types
+** Database
 
-GeoPackage or NetCDF, not Shapefile
+sqlite, MySQL, or any other open source database. The advantage of sqlite, if appropriate for a project, is that a single file contains the database and can therefore easily be shared.
 
-+ QGIS
-+ Styling
+** Geospatial raster
 
-** Timeseries
+See =File Format : NetCDF= or =File Format : GeoTIFF=
 
-*** CSV
+** Geospatial vector
 
-+ Time in first column
-+ ISO 8601 (see below)
+See =File Format : GeoPackage=
 
-*** NetCDF
+** Point cloud
 
-+ See above
-
-* Other / Misc
-
-** Dates
-
-Dates should be [[https://en.wikipedia.org/wiki/ISO_8601][ISO 8601 standard]].
-
-** Times
-
-Times should be in UTC. If desired, UTC times can be followed by local times.
-
-Justification: Both time zones and the definition of local time may changes if a location chooses to implement (or not) a "summer" or "winter" clock change. Therefore, noon today may be a different solar hour than noon tomorrow because of clock changes. Or noon today may be an hour different from noon on the same date 10 years from now, if a location stops or starts implementing a clock change.
+LAS or XYZ or OBJ or other point cloud
 
 ** Tables
 
 Any table in a paper that is more than a few cells in size should be included as a data product in a machine-readable format (e.g., CSV)
+
+** Time series
+
+TBD
+
+* Other
+:PROPERTIES:
+:ID:       20220821T212022
+:END:
+** Dates
+
++ Dates should be [[https://en.wikipedia.org/wiki/ISO_8601][ISO 8601 standard]].
+
+** Times
+
++ Times should be in UTC. If desired, UTC times can be followed by local times.
+
+Justification: Both time zones and the definition of local time may changes if a location chooses to implement (or not) a "summer" or "winter" clock change. Therefore, noon today may be a different solar hour than noon tomorrow because of clock changes. Or noon today may be an hour different from noon on the same date 10 years from now, if a location stops or starts implementing a clock change.
+

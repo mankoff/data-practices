@@ -68,9 +68,15 @@ gdal_translate NETCDF:"input.nc":variable_name output.tif
 gdal_translate -co "COMPRESS=DEFLATE" uncompress.tif compressed.tif
 #+END_SRC
 
+*** Cloud-optimized GeoTIFF
+
++ https://www.cogeo.org/
+
 ** NetCDF
 
-We suggest NetCDF as the best format for geospatial raster data, due to metadata support. NetCDF may take more time to produce than the traditional format, GeoTIFF, but is then often easier to use, and can easily be converted to GeoTIFF by users or producers if you want to provide data in both formats. 
+We suggest NetCDF as the best format for downloadable geospatial raster data, due to metadata support. NetCDF may take more time to produce than the traditional format, GeoTIFF, but is then often easier to use, and can easily be converted to GeoTIFF by users or producers if you want to provide data in both formats.
+
+If your data is large, consider =Zarr= for cloud-optimized storage of chunked, compressed, N-dimensional arrays.
 
 A well-produced NetCDF file should be able to be drag-and-dropped into [[https://qgis.org][QGIS]], and be properly projected into whatever projection is used by the open project, and correctly reproject on the fly by QGIS. In addition, if appropriate, the file should be compliant with [[http://cfconventions.org/][CF]] and [[https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3][ACDD]] metadata standards.
 

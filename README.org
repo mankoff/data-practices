@@ -34,6 +34,8 @@ This document is also a living document, and will change as best-practices chang
 
 ** Commas separated values (CSV)
 
+The CSV standard is well-defined in [[https://www.rfc-editor.org/rfc/rfc4180][RFC-4180]]. 
+
 If the data contains a lot of commas, then the data should be encoded in BSV (bar separated values) rather than CSV format. We find that the vertical bar or pipe symbol, "|", is one of the least common characters and is therefore less likely to occur in the data values than a comma.
 
 That is, instead of

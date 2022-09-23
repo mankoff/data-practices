@@ -1,0 +1,18 @@
+
+
+* Table of contents                               :toc_2:noexport:
+  - [[#introduction][Introduction]]
+  - [[#formats][Formats]]
+  - [[#issues][Issues]]
+
+** Introduction
+
+The purpose of this document is to provide guidance and suggestions for data best-practices. The target audience is authors contributing data to [[https://www.earth-system-science-data.net/][Earth System Science Data]] (ESSD), and therefore the expected data cover the Earth science domain. However, we hope the information contained here is useful even for people with no association with ESSD. Topics, concepts, formats, metadata suggested here are not a requirement for data published in ESSD, only a suggestion.
+
+** Formats
+
+A discussion of file formats can be found in [[file:formats.org]].
+
+** Issues
+
+The [[https://github.com/mankoff/data-practices/issues][Issues]] contain individual data best-practice issues, tagged by topic.
